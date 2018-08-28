@@ -24,9 +24,6 @@ namespace NMathematics.Functions
         public override Expression Substitute(IDictionary<char, double> definitions) => new Sin(InnerExpression.Substitute(definitions));
 
 
-        public static Multiplication operator *(Sin left, Expression right) => new Multiplication(left, right);
-        public static Addition operator +(Sin first, Expression second) => new Addition(first, second);
-
         //public static Expression operator *(Expression left, Sin right) => right * left;
 
         public override string ToString() => $"Sin({InnerExpression})";

@@ -14,9 +14,6 @@ namespace NMathematics
         }
         public char Symbol { get; }
 
-        public static Multiplication operator *(Variable first, Expression second) => new Multiplication(first, second);
-        public static Addition operator +(Variable first, Expression second) => new Addition(first, second);
-
         public override string ToString() => Symbol.ToString();
 
         public override Expression Derive() => new Constant(1);
