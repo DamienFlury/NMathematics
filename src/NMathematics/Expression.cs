@@ -13,6 +13,9 @@ namespace NMathematics
         public static Expression operator *(Expression left, Expression right) => new Multiplication(left, right);
         public static Expression operator +(Expression left, Expression right) => new Addition(left, right);
 
+        public static Expression operator -(Expression expression) => new Multiplication(expression, new Constant(-1));
+        public static Expression operator -(Expression left, Expression right) => left + -right;
+
         public abstract Constant ToConstant();
     }
 }

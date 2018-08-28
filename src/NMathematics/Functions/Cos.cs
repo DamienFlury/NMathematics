@@ -12,7 +12,7 @@ namespace NMathematics.Functions
 
         public Expression InnerExpression { get; }
 
-        public override Expression Derive() => new Sin(InnerExpression) * InnerExpression.Derive();
+        public override Expression Derive() => -new Sin(InnerExpression) * InnerExpression.Derive();
 
         public override Constant ToConstant()
         {
@@ -25,9 +25,6 @@ namespace NMathematics.Functions
 
         public override Expression Substitute(IDictionary<char, double> definitions) => new Cos(InnerExpression.Substitute(definitions));
 
-
-        public static Multiplication operator *(Cos left, Expression right) => new Multiplication(left, right);
-        public static Addition operator +(Cos first, Expression second) => new Addition(first, second);
 
         //public static Expression operator *(Expression left, Cos right) => right * left;
 
@@ -45,7 +42,7 @@ namespace NMathematics.Functions
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Cos) obj);
+            return Equals((Cos)obj);
         }
 
         public override int GetHashCode()
