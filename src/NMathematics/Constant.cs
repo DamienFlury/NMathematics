@@ -17,13 +17,28 @@ namespace NMathematics
         public double RealPart { get; }
         public double ImagPart { get; }
         public static Constant operator *(Constant first, Constant second) => 
-            new Constant(first.RealPart * second.RealPart - first.ImagPart * second.ImagPart, first.RealPart * second.ImagPart + first.ImagPart * second.ImagPart);
+            new Constant(first.RealPart * second.RealPart - first.ImagPart * second.ImagPart, first.RealPart * second.ImagPart + first.ImagPart * second.RealPart);
         public static Constant operator +(Constant first, Constant second) => new Constant(first.RealPart + second.RealPart, first.ImagPart + second.ImagPart);
+        public static Constant operator -(Constant first, Constant second) => new Constant(first.RealPart - second.RealPart, first.ImagPart - second.ImagPart);
 
+        public static Constant operator /(Constant first, Constant second)
+        {
+            var denominator = first * second.Conjugate();
+            var divisor = second.RealPart * second.RealPart + second.ImagPart * second.ImagPart;
+
+            return new Constant(denominator.RealPart / divisor, denominator.ImagPart / divisor);
+        }
+
+
+        //
+        // (a + bi) / (c + di) = ((a + bi) * (c - di)) / (c^2 + d^2)
+        //
 
         public override Expression Derive() => new Constant(0);
         public override Constant ToConstant() => this;
         public override Expression Substitute(IDictionary<char, double> definitions) => this;
+
+        public Constant Conjugate() => new Constant(RealPart, -ImagPart);
 
         public override string ToString()
         {
