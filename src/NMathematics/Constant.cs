@@ -70,5 +70,8 @@ namespace NMathematics
                 return (RealPart.GetHashCode() * 397) ^ ImagPart.GetHashCode();
             }
         }
+
+        public static bool operator ==(Constant left, Constant right) => left?.Equals(right) ?? right is null;
+        public static bool operator !=(Constant left, Constant right) => !(left == right);
     }
 }
