@@ -5,20 +5,32 @@ using System.Text;
 
 namespace NMathematics.Operations
 {
-    public class Subtraction : Operation
+    public struct Subtraction : IExpression
     {
-        public override Expression Derive() => Left.Derive() - Right.Derive();
+        public Subtraction(IExpression left, IExpression right)
+        {
+            Left = left;
+            Right = right;
+        }
 
-        public override Expression Substitute(IDictionary<char, double> definitions)
-            => Left.Substitute(definitions) - Right.Substitute(definitions);
+        public IExpression Left { get; }
+        public IExpression Right { get; }
+        public IExpression Derive() => Left.Derive().Subtract(Right.Derive());
 
-        public override Constant ToConstant()
+        public IExpression Substitute(IDictionary<char, double> definitions)
+            => Left.Substitute(definitions).Subtract(Right.Substitute(definitions));
+
+        public Constant ToConstant()
             => Left.ToConstant() - Right.ToConstant();
 
         public override string ToString() => $"{Left} - {Right}";
 
-        public Subtraction(Expression left, Expression right) : base(left, right)
-        {
-        }
+        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
+
+        public Division Divide(IExpression other) => new Division(this, other);
+
+        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
+
+        public Addition Add(IExpression other) => new Addition(this, other);
     }
 }

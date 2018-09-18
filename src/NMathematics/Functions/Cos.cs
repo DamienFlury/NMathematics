@@ -5,16 +5,16 @@ using NMathematics.Operations;
 
 namespace NMathematics.Functions
 {
-    public class Cos : Expression, IEquatable<Cos>
+    public struct Cos : IExpression, IEquatable<Cos>
     {
 
-        public Cos(Expression innerExpression) => InnerExpression = innerExpression;
+        public Cos(IExpression innerExpression) => InnerExpression = innerExpression;
 
-        public Expression InnerExpression { get; }
+        public IExpression InnerExpression { get; }
 
-        public override Expression Derive() => -new Sin(InnerExpression) * InnerExpression.Derive();
+        public IExpression Derive() => new Constant(-1).Multiply(new Sin(InnerExpression)).Multiply(InnerExpression.Derive());
 
-        public override Constant ToConstant()
+        public Constant ToConstant()
         {
             var inner = InnerExpression.ToConstant();
             var a = inner.RealPart;
@@ -23,7 +23,7 @@ namespace NMathematics.Functions
             return new Constant(Math.Cos(a) * Math.Cosh(b), -Math.Sin(a) * Math.Sinh(b));
         }
 
-        public override Expression Substitute(IDictionary<char, double> definitions) => new Cos(InnerExpression.Substitute(definitions));
+        public IExpression Substitute(IDictionary<char, double> definitions) => new Cos(InnerExpression.Substitute(definitions));
 
 
         //public static Expression operator *(Expression left, Cos right) => right * left;
@@ -49,5 +49,13 @@ namespace NMathematics.Functions
         {
             return (InnerExpression != null ? InnerExpression.GetHashCode() : 0);
         }
+
+        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
+
+        public Division Divide(IExpression other) => new Division(this, other);
+
+        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
+
+        public Addition Add(IExpression other) => new Addition(this, other);
     }
 }
