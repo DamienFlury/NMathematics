@@ -34,7 +34,7 @@ namespace NMathematics.Tests
         [Fact]
         public void DeriveTest()
         {
-            var expected = new Cos(new Constant(1)) * new Constant(0);
+            var expected = new Cos(new Constant(1)).Multiply(new Constant(0));
 
             var actual = new Sin(new Constant(1)).Derive();
 

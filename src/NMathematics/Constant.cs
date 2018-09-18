@@ -6,7 +6,7 @@ using NMathematics.Operations;
 
 namespace NMathematics
 {
-    public class Constant : Expression, IEquatable<Constant>
+    public struct Constant : IExpression, IEquatable<Constant>
     {
         public Constant(double realPart, double imagPart = 0)
         {
@@ -34,9 +34,9 @@ namespace NMathematics
         // (a + bi) / (c + di) = ((a + bi) * (c - di)) / (c^2 + d^2)
         //
 
-        public override Expression Derive() => new Constant(0);
-        public override Constant ToConstant() => this;
-        public override Expression Substitute(IDictionary<char, double> definitions) => this;
+        public IExpression Derive() => new Constant(0);
+        public Constant ToConstant() => this;
+        public IExpression Substitute(IDictionary<char, double> definitions) => this;
 
         public Constant Conjugate() => new Constant(RealPart, -ImagPart);
 
@@ -71,7 +71,15 @@ namespace NMathematics
             }
         }
 
-        public static bool operator ==(Constant left, Constant right) => left?.Equals(right) ?? right is null;
+        public static bool operator ==(Constant left, Constant right) => left.Equals(right);
         public static bool operator !=(Constant left, Constant right) => !(left == right);
+
+        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
+
+        public Division Divide(IExpression other) => new Division(this, other);
+
+        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
+
+        public Addition Add(IExpression other) => new Addition(this, other);
     }
 }
