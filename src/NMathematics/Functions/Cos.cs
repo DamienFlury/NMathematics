@@ -12,11 +12,7 @@ namespace NMathematics.Functions
 
         public IExpression InnerExpression { get; }
 
-<<<<<<< HEAD
-        public override Expression Derive() => -new Sin(InnerExpression) * InnerExpression.Derive();
-=======
         public IExpression Derive() => new Constant(-1).Multiply(new Sin(InnerExpression)).Multiply(InnerExpression.Derive());
->>>>>>> develop
 
         public Constant ToConstant()
         {
