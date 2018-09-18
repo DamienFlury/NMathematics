@@ -4,9 +4,9 @@ using System.Text;
 
 namespace NMathematics.Operations
 {
-    public struct Multiplication : IExpression
+    public struct Division : IExpression
     {
-        public Multiplication(IExpression left, IExpression right)
+        public Division(IExpression left, IExpression right)
         {
             Left = left;
             Right = right;
@@ -15,13 +15,10 @@ namespace NMathematics.Operations
         public IExpression Left { get; }
         public IExpression Right { get; }
 
-        public IExpression Derive() => new Addition(new Multiplication(Left.Derive(), Right), new Multiplication(Left, Right.Derive()));
+        public IExpression Derive() => Left.Derive().Multiply(Right).Subtract(Left.Multiply(Right.Derive()));
 
-        public Constant ToConstant() => Left.ToConstant() * Right.ToConstant();
-        public IExpression Substitute(IDictionary<char, double> definitions) => new Multiplication(Left.Substitute(definitions), Right.Substitute(definitions));
-
-
-        public override string ToString() => $"{Left} * {Right}";
+        public IExpression Substitute(IDictionary<char, double> definitions)
+            => Left.Substitute(definitions).Divide(Right.Substitute(definitions));
 
         public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
 
@@ -30,6 +27,7 @@ namespace NMathematics.Operations
         public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
 
         public Addition Add(IExpression other) => new Addition(this, other);
+
+        public Constant ToConstant() => Left.ToConstant() / Right.ToConstant();
     }
 }
-
