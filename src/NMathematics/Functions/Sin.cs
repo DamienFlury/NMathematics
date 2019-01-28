@@ -5,36 +5,28 @@ using NMathematics.Operations;
 
 namespace NMathematics.Functions
 {
-    public struct Sin : IExpression, IEquatable<Sin>
+    public class Sin : Expression, IEquatable<Sin>
     {
-        public Sin(IExpression innerExpression) => InnerExpression = innerExpression;
+        public Sin(Expression innerExpression) => InnerExpression = innerExpression;
 
-        public IExpression InnerExpression { get; }
-        public IExpression Derive() => new Cos(InnerExpression) .Multiply(InnerExpression.Derive());
+        public Expression InnerExpression { get; }
+        public override Expression Derive() => new Cos(InnerExpression)  * InnerExpression.Derive();
 
-        public Constant ToConstant()
+        public override Constant ToConstant()
         {
             var inner = InnerExpression.ToConstant();
             var a = inner.RealPart;
-            var b = inner.ImagPart;
+            var b = inner.ImaginaryPart;
 
             return new Constant(Math.Sin(a) * Math.Cosh(b), Math.Cos(a) * Math.Sinh(b));
         }
 
-        public IExpression Substitute(IDictionary<char, double> definitions) => new Sin(InnerExpression.Substitute(definitions));
+        public override Expression Substitute(IDictionary<char, double> definitions) => new Sin(InnerExpression.Substitute(definitions));
 
 
         //public static Expression operator *(Expression left, Sin right) => right * left;
 
         public override string ToString() => $"Sin({InnerExpression})";
-
-        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
-
-        public Division Divide(IExpression other) => new Division(this, other);
-
-        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
-
-        public Addition Add(IExpression other) => new Addition(this, other);
 
         public bool Equals(Sin other)
         {
@@ -54,6 +46,16 @@ namespace NMathematics.Functions
         public override int GetHashCode()
         {
             return (InnerExpression != null ? InnerExpression.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(Sin left, Sin right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Sin left, Sin right)
+        {
+            return !Equals(left, right);
         }
     }
 }

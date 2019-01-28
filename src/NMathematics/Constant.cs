@@ -6,27 +6,27 @@ using NMathematics.Operations;
 
 namespace NMathematics
 {
-    public struct Constant : IExpression, IEquatable<Constant>
+    public class Constant : Expression, IEquatable<Constant>
     {
-        public Constant(double realPart, double imagPart = 0)
+        public Constant(double realPart, double imaginaryPart = 0)
         {
             RealPart = realPart;
-            ImagPart = imagPart;
+            ImaginaryPart = imaginaryPart;
         }
 
         public double RealPart { get; }
-        public double ImagPart { get; }
+        public double ImaginaryPart { get; }
         public static Constant operator *(Constant first, Constant second) => 
-            new Constant(first.RealPart * second.RealPart - first.ImagPart * second.ImagPart, first.RealPart * second.ImagPart + first.ImagPart * second.RealPart);
-        public static Constant operator +(Constant first, Constant second) => new Constant(first.RealPart + second.RealPart, first.ImagPart + second.ImagPart);
-        public static Constant operator -(Constant first, Constant second) => new Constant(first.RealPart - second.RealPart, first.ImagPart - second.ImagPart);
+            new Constant(first.RealPart * second.RealPart - first.ImaginaryPart * second.ImaginaryPart, first.RealPart * second.ImaginaryPart + first.ImaginaryPart * second.RealPart);
+        public static Constant operator +(Constant first, Constant second) => new Constant(first.RealPart + second.RealPart, first.ImaginaryPart + second.ImaginaryPart);
+        public static Constant operator -(Constant first, Constant second) => new Constant(first.RealPart - second.RealPart, first.ImaginaryPart - second.ImaginaryPart);
 
         public static Constant operator /(Constant first, Constant second)
         {
             var denominator = first * second.Conjugate();
-            var divisor = second.RealPart * second.RealPart + second.ImagPart * second.ImagPart;
+            var divisor = second.RealPart * second.RealPart + second.ImaginaryPart * second.ImaginaryPart;
 
-            return new Constant(denominator.RealPart / divisor, denominator.ImagPart / divisor);
+            return new Constant(denominator.RealPart / divisor, denominator.ImaginaryPart / divisor);
         }
 
 
@@ -34,25 +34,17 @@ namespace NMathematics
         // (a + bi) / (c + di) = ((a + bi) * (c - di)) / (c^2 + d^2)
         //
 
-        public IExpression Derive() => new Constant(0);
-        public Constant ToConstant() => this;
-        public IExpression Substitute(IDictionary<char, double> definitions) => this;
+        public override Expression Derive() => new Constant(0);
+        public override Constant ToConstant() => this;
+        public override Expression Substitute(IDictionary<char, double> definitions) => this;
 
-        public Constant Conjugate() => new Constant(RealPart, -ImagPart);
-
-        public override string ToString()
-        {
-            if (ImagPart == 0) return RealPart.ToString(CultureInfo.InvariantCulture);
-            if (RealPart == 0) return $"{ImagPart}i";
-            return $"({RealPart} + {ImagPart}i)";
-        }
+        public Constant Conjugate() => new Constant(RealPart, -ImaginaryPart);
 
         public bool Equals(Constant other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            const double tolerance = 0.000000000000001;
-            return Math.Abs(RealPart - other.RealPart) < tolerance && Math.Abs(ImagPart - other.ImagPart) < tolerance;
+            return RealPart.Equals(other.RealPart) && ImaginaryPart.Equals(other.ImaginaryPart);
         }
 
         public override bool Equals(object obj)
@@ -67,19 +59,18 @@ namespace NMathematics
         {
             unchecked
             {
-                return (RealPart.GetHashCode() * 397) ^ ImagPart.GetHashCode();
+                return (RealPart.GetHashCode() * 397) ^ ImaginaryPart.GetHashCode();
             }
         }
 
-        public static bool operator ==(Constant left, Constant right) => left.Equals(right);
-        public static bool operator !=(Constant left, Constant right) => !(left == right);
+        public static bool operator ==(Constant left, Constant right)
+        {
+            return Equals(left, right);
+        }
 
-        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
-
-        public Division Divide(IExpression other) => new Division(this, other);
-
-        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
-
-        public Addition Add(IExpression other) => new Addition(this, other);
+        public static bool operator !=(Constant left, Constant right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

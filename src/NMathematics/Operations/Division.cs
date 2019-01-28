@@ -4,30 +4,55 @@ using System.Text;
 
 namespace NMathematics.Operations
 {
-    public struct Division : IExpression
+    public class Division : Expression, IEquatable<Division>
     {
-        public Division(IExpression left, IExpression right)
+        public Division(Expression left, Expression right)
         {
             Left = left;
             Right = right;
         }
 
-        public IExpression Left { get; }
-        public IExpression Right { get; }
+        public Expression Left { get; }
+        public Expression Right { get; }
 
-        public IExpression Derive() => Left.Derive().Multiply(Right).Subtract(Left.Multiply(Right.Derive()));
+        public override Expression Derive() => Left.Derive() * Right - Left * Right.Derive();
 
-        public IExpression Substitute(IDictionary<char, double> definitions)
-            => Left.Substitute(definitions).Divide(Right.Substitute(definitions));
+        public override Expression Substitute(IDictionary<char, double> definitions)
+            => Left.Substitute(definitions) / Right.Substitute(definitions);
 
-        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
+        public override Constant ToConstant() => Left.ToConstant() / Right.ToConstant();
 
-        public Division Divide(IExpression other) => new Division(this, other);
+        public bool Equals(Division other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(Left, other.Left) && Equals(Right, other.Right);
+        }
 
-        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Division) obj);
+        }
 
-        public Addition Add(IExpression other) => new Addition(this, other);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Left != null ? Left.GetHashCode() : 0) * 397) ^ (Right != null ? Right.GetHashCode() : 0);
+            }
+        }
 
-        public Constant ToConstant() => Left.ToConstant() / Right.ToConstant();
+        public static bool operator ==(Division left, Division right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Division left, Division right)
+        {
+            return !Equals(left, right);
+        }
     }
 }

@@ -5,25 +5,25 @@ using NMathematics.Operations;
 
 namespace NMathematics.Functions
 {
-    public struct Cos : IExpression, IEquatable<Cos>
+    public class Cos : Expression, IEquatable<Cos>
     {
 
-        public Cos(IExpression innerExpression) => InnerExpression = innerExpression;
+        public Cos(Expression innerExpression) => InnerExpression = innerExpression;
 
-        public IExpression InnerExpression { get; }
+        public Expression InnerExpression { get; }
 
-        public IExpression Derive() => new Constant(-1).Multiply(new Sin(InnerExpression)).Multiply(InnerExpression.Derive());
+        public override Expression Derive() => new Constant(-1) * new Sin(InnerExpression) * InnerExpression.Derive();
 
-        public Constant ToConstant()
+        public override Constant ToConstant()
         {
             var inner = InnerExpression.ToConstant();
             var a = inner.RealPart;
-            var b = inner.ImagPart;
+            var b = inner.ImaginaryPart;
 
             return new Constant(Math.Cos(a) * Math.Cosh(b), -Math.Sin(a) * Math.Sinh(b));
         }
 
-        public IExpression Substitute(IDictionary<char, double> definitions) => new Cos(InnerExpression.Substitute(definitions));
+        public override Expression Substitute(IDictionary<char, double> definitions) => new Cos(InnerExpression.Substitute(definitions));
 
 
         //public static Expression operator *(Expression left, Cos right) => right * left;
@@ -42,7 +42,7 @@ namespace NMathematics.Functions
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Cos)obj);
+            return Equals((Cos) obj);
         }
 
         public override int GetHashCode()
@@ -50,12 +50,14 @@ namespace NMathematics.Functions
             return (InnerExpression != null ? InnerExpression.GetHashCode() : 0);
         }
 
-        public Multiplication Multiply(IExpression other) => new Multiplication(this, other);
+        public static bool operator ==(Cos left, Cos right)
+        {
+            return Equals(left, right);
+        }
 
-        public Division Divide(IExpression other) => new Division(this, other);
-
-        public Subtraction Subtract(IExpression other) => new Subtraction(this, other);
-
-        public Addition Add(IExpression other) => new Addition(this, other);
+        public static bool operator !=(Cos left, Cos right)
+        {
+            return !Equals(left, right);
+        }
     }
 }
